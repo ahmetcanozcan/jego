@@ -1,7 +1,5 @@
-import env from 'env'
-
-console.log(Object.keys(env), "env")
+import custom from 'custom'
 
 export default (v) =>  {
-    return v * 2
+    return custom.double(v)
 }
