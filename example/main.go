@@ -30,6 +30,10 @@ func (cm *customModule) Copy() jego.Module {
 func main() {
 	e := jego.New().Register("custom", &customModule{})
 	s, _ := e.Script(strings.NewReader(testFile))
+
+	foo, _ := s.GetExport("foo")
+	fmt.Println(foo) // prints bar
+
 	r, _ := s.Run(context.Background(), 5)
 	fmt.Println(r) // prints 10
 	r, _ = s.Run(context.Background(), 15)
