@@ -12,11 +12,12 @@ import (
 
 type Script interface {
 	Run(ctx context.Context, arg any) (any, error)
+	GetExport(name string) (any, error)
 }
 
 type script struct {
 	vm *otto.Otto
-	fn *otto.Object
+	fn otto.Value
 	mr *moduleRegistery
 }
 
@@ -39,7 +40,7 @@ func (s *script) init(source io.Reader) error {
 		return err
 	}
 
-	if s.fn, err = util.GetObject(s.vm, "exports", "default"); err != nil {
+	if s.fn, err = util.GetValue(s.vm, "exports", "default"); err != nil {
 		return err
 	}
 
@@ -47,7 +48,15 @@ func (s *script) init(source io.Reader) error {
 }
 
 func (s *script) Run(ctx context.Context, arg any) (any, error) {
-	return s.fn.Value().Call(otto.UndefinedValue(), arg)
+	return s.fn.Call(otto.UndefinedValue(), arg)
+}
+
+func (s *script) GetExport(name string) (any, error) {
+	v, err := util.GetValue(s.vm, "exports", name)
+	if err != nil {
+		return nil, err
+	}
+	return v.Export()
 }
 
 func (s *script) createBaseVM() *otto.Otto {

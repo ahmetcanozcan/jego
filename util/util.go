@@ -1,6 +1,10 @@
 package util
 
-import "github.com/robertkrimen/otto"
+import (
+	"fmt"
+
+	"github.com/robertkrimen/otto"
+)
 
 func RunMultiScripts(vm *otto.Otto, sc ...string) error {
 	for _, s := range sc {
@@ -11,20 +15,22 @@ func RunMultiScripts(vm *otto.Otto, sc ...string) error {
 	return nil
 }
 
-func GetObject(vm *otto.Otto, field string, nesteds ...string) (*otto.Object, error) {
-	v, err := vm.Get(field)
+func GetValue(vm *otto.Otto, field string, nesteds ...string) (res otto.Value, err error) {
+	res, err = vm.Get(field)
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 
-	o := v.Object()
 	for _, f := range nesteds {
-		v, err := o.Get(f)
-		if err != nil {
-			return nil, err
+		o := res.Object()
+		if o == nil {
+			return res, fmt.Errorf("%s is not an object", f)
 		}
-		o = v.Object()
+		res, err = o.Get(f)
+		if err != nil {
+			return res, err
+		}
 	}
 
-	return o, nil
+	return res, nil
 }
