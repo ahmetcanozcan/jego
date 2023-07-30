@@ -1,8 +1,6 @@
 package module
 
-import "github.com/robertkrimen/otto"
-
 type Module interface {
-	Require(vm *otto.Otto) (any, error)
+	Require() (any, error)
 	Copy() Module
 }

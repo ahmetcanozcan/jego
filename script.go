@@ -61,7 +61,7 @@ func (s *script) createBaseVM() *otto.Otto {
 }
 
 func (s *script) require(name string) any {
-	r, err := s.mr.require(s.vm, name)
+	r, err := s.mr.require(name)
 	if err != nil {
 		panic(err)
 	}

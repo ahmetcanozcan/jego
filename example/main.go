@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/ahmetcanozcan/jego"
-	"github.com/robertkrimen/otto"
 )
 
 //go:embed file.js
@@ -16,7 +15,7 @@ var testFile string
 type customModule struct {
 }
 
-func (*customModule) Require(*otto.Otto) (any, error) {
+func (*customModule) Require() (any, error) {
 	return jego.JSObject{
 		"double": func(b float64) float64 {
 			return b * 2

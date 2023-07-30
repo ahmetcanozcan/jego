@@ -45,7 +45,7 @@ func (mr *moduleRegistery) copy() *moduleRegistery {
 	}
 }
 
-func (mr *moduleRegistery) require(vm *otto.Otto, name string) (any, error) {
+func (mr *moduleRegistery) require(name string) (any, error) {
 	mr.rw.Lock()
 	defer mr.rw.Unlock()
 	m, ok := mr.modules[name]
@@ -53,5 +53,5 @@ func (mr *moduleRegistery) require(vm *otto.Otto, name string) (any, error) {
 		return nil, fmt.Errorf("module %s not found!", name)
 	}
 
-	return m.Require(vm)
+	return m.Require()
 }
