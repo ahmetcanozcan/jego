@@ -11,6 +11,8 @@ import (
 type Script interface {
 	Run(ctx context.Context, arg any) (any, error)
 	GetExport(name string) (any, error)
+	GetValue(name string) (Value, error)
+	GetObject(name string) (*Object, error)
 }
 
 type script struct {

@@ -37,3 +37,26 @@ func (e *Engine) Script(buff io.Reader) (Script, error) {
 	}
 	return newScript(src, e.mr.Copy())
 }
+
+func (e *Engine) ImportJSModule(src io.Reader) (Module, error) {
+	transformed, err := js.Transform(src)
+	if err != nil {
+		return nil, err
+	}
+	sc, err := newScript(transformed, e.mr.Copy())
+	if err != nil {
+		return nil, err
+	}
+
+	v, err := sc.GetValue("default")
+	if err != nil {
+		return nil, err
+	}
+
+	if v.IsObject() {
+		return ValueModule(v.Object()), nil
+
+	}
+
+	return ValueModule(v), nil
+}
