@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/ahmetcanozcan/jego/js"
 	"github.com/robertkrimen/otto"
 )
 
@@ -29,20 +28,24 @@ func newScript(source io.Reader, mr ModuleRegistery) (Script, error) {
 }
 
 func (s *script) init(source io.Reader) error {
-	s.vm = s.createBaseVM()
+	vm, err := createBaseVM(s.mr)
+	if err != nil {
+		return err
+	}
 
 	b, err := ioutil.ReadAll(source)
 	if err != nil {
 		return err
 	}
-	if _, err := s.vm.Run(string(b)); err != nil {
+	if _, err := vm.Run(string(b)); err != nil {
 		return err
 	}
 
-	if s.fn, err = GetValue(s.vm, "exports", "default"); err != nil {
+	if s.fn, err = GetValue(vm, "exports", "default"); err != nil {
 		return err
 	}
 
+	s.vm = vm
 	return nil
 }
 
@@ -56,22 +59,4 @@ func (s *script) GetExport(name string) (any, error) {
 		return nil, err
 	}
 	return v.Export()
-}
-
-func (s *script) createBaseVM() *otto.Otto {
-	vm := otto.New()
-	vm.Set("require", s.require)
-	runMultiScripts(
-		vm,
-		js.ExportJS,
-	)
-	return vm
-}
-
-func (s *script) require(name string) any {
-	r, err := s.mr.Require(name)
-	if err != nil {
-		panic(err)
-	}
-	return r
 }

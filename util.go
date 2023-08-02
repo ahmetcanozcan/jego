@@ -2,7 +2,29 @@ package jego
 
 import (
 	"fmt"
+
+	"github.com/ahmetcanozcan/jego/js"
+	"github.com/robertkrimen/otto"
 )
+
+func createBaseVM(mr ModuleRegistery) (VM, error) {
+	vm := otto.New()
+	vm.Set("require", func(name string) any {
+		r, err := mr.Require(name)
+		if err != nil {
+			panic(err)
+		}
+		return r
+	})
+	err := runMultiScripts(
+		vm,
+		js.ExportJS,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return vm, nil
+}
 
 func runMultiScripts(vm VM, sc ...string) error {
 	for _, s := range sc {
