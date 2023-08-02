@@ -16,3 +16,19 @@ func (fm FuncModule) Require() (any, error) {
 func (fm FuncModule) Copy() Module {
 	return fm
 }
+
+type valueModule struct {
+	val any
+}
+
+func ValueModule(v any) Module {
+	return &valueModule{v}
+}
+
+func (m *valueModule) Require() (any, error) {
+	return m.val, nil
+}
+
+func (m *valueModule) Copy() Module {
+	return m
+}
