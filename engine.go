@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/ahmetcanozcan/jego/js"
-	"github.com/ahmetcanozcan/jego/module"
 )
 
 type Engine struct {
@@ -26,7 +25,7 @@ func (e *Engine) init() error {
 	return nil
 }
 
-func (e *Engine) Register(name string, module module.Module) *Engine {
+func (e *Engine) Register(name string, module Module) *Engine {
 	e.mr.Register(name, module)
 	return e
 }

@@ -1,4 +1,4 @@
-package module
+package jego
 
 type Module interface {
 	Require() (any, error)

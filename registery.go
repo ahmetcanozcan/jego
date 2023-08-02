@@ -3,41 +3,38 @@ package jego
 import (
 	"fmt"
 	"sync"
-
-	"github.com/ahmetcanozcan/jego/module"
-	"github.com/robertkrimen/otto"
 )
 
 type ModuleRegistery interface {
-	Register(name string, mod module.Module)
+	Register(name string, mod Module)
 	Copy() ModuleRegistery
 	Require(name string) (any, error)
 }
 
 type moduleRegistery struct {
 	rw      sync.Mutex
-	modules map[string]module.Module
+	modules map[string]Module
 	cacheRw sync.Mutex
-	cache   map[string]*otto.Object
+	cache   map[string]*Object
 }
 
 func newModuleRegistery() ModuleRegistery {
 	return &moduleRegistery{
-		modules: make(map[string]module.Module),
-		cache:   make(map[string]*otto.Object),
+		modules: make(map[string]Module),
+		cache:   make(map[string]*Object),
 	}
 }
 
-func (mr *moduleRegistery) Register(name string, mod module.Module) {
+func (mr *moduleRegistery) Register(name string, mod Module) {
 	mr.rw.Lock()
 	defer mr.rw.Unlock()
 	mr.modules[name] = mod
 }
 
-func (mr *moduleRegistery) copyModules() map[string]module.Module {
+func (mr *moduleRegistery) copyModules() map[string]Module {
 	mr.rw.Lock()
 	defer mr.rw.Unlock()
-	cp := make(map[string]module.Module, len(mr.modules))
+	cp := make(map[string]Module, len(mr.modules))
 	for k, v := range mr.modules {
 		cp[k] = v.Copy()
 	}
@@ -47,7 +44,7 @@ func (mr *moduleRegistery) copyModules() map[string]module.Module {
 func (mr *moduleRegistery) Copy() ModuleRegistery {
 	return &moduleRegistery{
 		modules: mr.copyModules(),
-		cache:   make(map[string]*otto.Object),
+		cache:   make(map[string]*Object),
 	}
 }
 

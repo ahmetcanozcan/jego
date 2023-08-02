@@ -1,12 +1,10 @@
-package util
+package jego
 
 import (
 	"fmt"
-
-	"github.com/robertkrimen/otto"
 )
 
-func RunMultiScripts(vm *otto.Otto, sc ...string) error {
+func runMultiScripts(vm VM, sc ...string) error {
 	for _, s := range sc {
 		if _, err := vm.Run(s); err != nil {
 			return err
@@ -15,7 +13,7 @@ func RunMultiScripts(vm *otto.Otto, sc ...string) error {
 	return nil
 }
 
-func GetValue(vm *otto.Otto, field string, nesteds ...string) (res otto.Value, err error) {
+func GetValue(vm VM, field string, nesteds ...string) (res Value, err error) {
 	res, err = vm.Get(field)
 	if err != nil {
 		return res, err
@@ -35,7 +33,7 @@ func GetValue(vm *otto.Otto, field string, nesteds ...string) (res otto.Value, e
 	return res, nil
 }
 
-func GetObject(vm *otto.Otto, field string, nesteds ...string) (*otto.Object, error) {
+func GetObject(vm VM, field string, nesteds ...string) (*Object, error) {
 	v, err := GetValue(vm, field, nesteds...)
 	if err != nil {
 		return nil, err

@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 
 	"github.com/ahmetcanozcan/jego/js"
-	"github.com/ahmetcanozcan/jego/util"
 	"github.com/robertkrimen/otto"
 )
 
@@ -17,7 +16,7 @@ type Script interface {
 
 type script struct {
 	vm *otto.Otto
-	fn otto.Value
+	fn Value
 	mr ModuleRegistery
 }
 
@@ -40,7 +39,7 @@ func (s *script) init(source io.Reader) error {
 		return err
 	}
 
-	if s.fn, err = util.GetValue(s.vm, "exports", "default"); err != nil {
+	if s.fn, err = GetValue(s.vm, "exports", "default"); err != nil {
 		return err
 	}
 
@@ -52,7 +51,7 @@ func (s *script) Run(ctx context.Context, arg any) (any, error) {
 }
 
 func (s *script) GetExport(name string) (any, error) {
-	v, err := util.GetValue(s.vm, "exports", name)
+	v, err := GetValue(s.vm, "exports", name)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +61,7 @@ func (s *script) GetExport(name string) (any, error) {
 func (s *script) createBaseVM() *otto.Otto {
 	vm := otto.New()
 	vm.Set("require", s.require)
-	util.RunMultiScripts(
+	runMultiScripts(
 		vm,
 		js.ExportJS,
 	)
