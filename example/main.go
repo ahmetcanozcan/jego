@@ -28,7 +28,15 @@ func (cm *customModule) Copy() jego.Module {
 }
 
 func main() {
-	e := jego.New().Register("custom", &customModule{})
+	e := jego.New().
+		Register("custom", &customModule{}).
+		Register("functional", jego.FuncModule(func() (any, error) {
+			return jego.JSObject{
+				"foo": "bar",
+				"zoo": 18,
+			}, nil
+		}))
+
 	s, _ := e.Script(strings.NewReader(testFile))
 
 	foo, _ := s.GetExport("foo")
