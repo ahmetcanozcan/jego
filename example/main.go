@@ -12,6 +12,9 @@ import (
 //go:embed file.js
 var testFile string
 
+//go:embed mod.js
+var modJS string
+
 type customModule struct {
 }
 
@@ -28,17 +31,25 @@ func (cm *customModule) Copy() jego.Module {
 }
 
 func main() {
-	e := jego.New().
-		Register("custom", &customModule{}).
-		Register("echo", jego.ValueModule(func(v string) string {
-			return "echo: " + v
-		})).
-		Register("functional", jego.FuncModule(func() (any, error) {
-			return jego.JSObject{
-				"foo": "bar",
-				"zoo": 18,
-			}, nil
-		}))
+
+	e := jego.New()
+	e.Register("custom", &customModule{})
+	e.Register("echo", jego.ValueModule(func(v string) string {
+		return "echo: " + v
+	}))
+	e.Register("functional", jego.FuncModule(func() (any, error) {
+		return jego.JSObject{
+			"foo": "bar",
+			"zoo": 18,
+		}, nil
+	}))
+
+	modJS, err := e.ImportJSModule(strings.NewReader(modJS))
+	if err != nil {
+		panic(err)
+	}
+
+	e.Register("mod", modJS)
 
 	s, _ := e.Script(strings.NewReader(testFile))
 
