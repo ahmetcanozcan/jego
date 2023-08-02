@@ -30,6 +30,9 @@ func (cm *customModule) Copy() jego.Module {
 func main() {
 	e := jego.New().
 		Register("custom", &customModule{}).
+		Register("echo", jego.ValueModule(func(v string) string {
+			return "echo: " + v
+		})).
 		Register("functional", jego.FuncModule(func() (any, error) {
 			return jego.JSObject{
 				"foo": "bar",
