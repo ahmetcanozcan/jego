@@ -14,7 +14,7 @@ type Script interface {
 }
 
 type script struct {
-	vm *otto.Otto
+	vm VM
 	fn Value
 	mr ModuleRegistery
 }
