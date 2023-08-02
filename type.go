@@ -6,6 +6,8 @@ import (
 )
 
 type (
-	Module   = module.Module
+	Module     = module.Module
+	FuncModule = module.FuncModule
+
 	JSObject = js.Object
 )
