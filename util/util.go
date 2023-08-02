@@ -34,3 +34,11 @@ func GetValue(vm *otto.Otto, field string, nesteds ...string) (res otto.Value, e
 
 	return res, nil
 }
+
+func GetObject(vm *otto.Otto, field string, nesteds ...string) (*otto.Object, error) {
+	v, err := GetValue(vm, field, nesteds...)
+	if err != nil {
+		return nil, err
+	}
+	return v.Object(), nil
+}
