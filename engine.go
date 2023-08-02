@@ -8,7 +8,7 @@ import (
 )
 
 type Engine struct {
-	mr *moduleRegistery
+	mr ModuleRegistery
 }
 
 func New() *Engine {
@@ -27,7 +27,7 @@ func (e *Engine) init() error {
 }
 
 func (e *Engine) Register(name string, module module.Module) *Engine {
-	e.mr.register(name, module)
+	e.mr.Register(name, module)
 	return e
 }
 
@@ -36,5 +36,5 @@ func (e *Engine) Script(buff io.Reader) (Script, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newScript(src, e.mr.copy())
+	return newScript(src, e.mr.Copy())
 }

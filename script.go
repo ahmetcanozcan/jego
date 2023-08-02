@@ -18,10 +18,10 @@ type Script interface {
 type script struct {
 	vm *otto.Otto
 	fn otto.Value
-	mr *moduleRegistery
+	mr ModuleRegistery
 }
 
-func newScript(source io.Reader, mr *moduleRegistery) (Script, error) {
+func newScript(source io.Reader, mr ModuleRegistery) (Script, error) {
 	s := &script{mr: mr}
 	if err := s.init(source); err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (s *script) createBaseVM() *otto.Otto {
 }
 
 func (s *script) require(name string) any {
-	r, err := s.mr.require(name)
+	r, err := s.mr.Require(name)
 	if err != nil {
 		panic(err)
 	}

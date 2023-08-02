@@ -8,6 +8,12 @@ import (
 	"github.com/robertkrimen/otto"
 )
 
+type ModuleRegistery interface {
+	Register(name string, mod module.Module)
+	Copy() ModuleRegistery
+	Require(name string) (any, error)
+}
+
 type moduleRegistery struct {
 	rw      sync.Mutex
 	modules map[string]module.Module
@@ -15,14 +21,14 @@ type moduleRegistery struct {
 	cache   map[string]*otto.Object
 }
 
-func newModuleRegistery() *moduleRegistery {
+func newModuleRegistery() ModuleRegistery {
 	return &moduleRegistery{
 		modules: make(map[string]module.Module),
 		cache:   make(map[string]*otto.Object),
 	}
 }
 
-func (mr *moduleRegistery) register(name string, mod module.Module) {
+func (mr *moduleRegistery) Register(name string, mod module.Module) {
 	mr.rw.Lock()
 	defer mr.rw.Unlock()
 	mr.modules[name] = mod
@@ -38,14 +44,14 @@ func (mr *moduleRegistery) copyModules() map[string]module.Module {
 	return cp
 }
 
-func (mr *moduleRegistery) copy() *moduleRegistery {
+func (mr *moduleRegistery) Copy() ModuleRegistery {
 	return &moduleRegistery{
 		modules: mr.copyModules(),
 		cache:   make(map[string]*otto.Object),
 	}
 }
 
-func (mr *moduleRegistery) require(name string) (any, error) {
+func (mr *moduleRegistery) Require(name string) (any, error) {
 	mr.rw.Lock()
 	defer mr.rw.Unlock()
 	m, ok := mr.modules[name]
