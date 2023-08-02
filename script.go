@@ -53,10 +53,22 @@ func (s *script) Run(ctx context.Context, arg any) (any, error) {
 	return s.fn.Call(otto.UndefinedValue(), arg)
 }
 
+func (s *script) GetValue(name string) (Value, error) {
+	return GetValue(s.vm, "exports", name)
+}
+
 func (s *script) GetExport(name string) (any, error) {
-	v, err := GetValue(s.vm, "exports", name)
+	v, err := s.GetValue(name)
 	if err != nil {
 		return nil, err
 	}
 	return v.Export()
+}
+
+func (s *script) GetObject(name string) (*Object, error) {
+	v, err := s.GetValue(name)
+	if err != nil {
+		return nil, err
+	}
+	return v.Object(), nil
 }
