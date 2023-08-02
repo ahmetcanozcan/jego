@@ -23,7 +23,6 @@ func New() *Engine {
 }
 
 func (e *Engine) init() error {
-	e.mr.register("env", module.Env())
 	return nil
 }
 
