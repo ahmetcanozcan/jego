@@ -12,17 +12,28 @@ type ModuleRegistery interface {
 }
 
 type moduleRegistery struct {
-	rw      sync.Mutex
-	modules map[string]Module
-	cacheRw sync.Mutex
-	cache   map[string]*Object
+	rw             sync.Mutex
+	modules        map[string]Module
+	cacheRw        sync.Mutex
+	cache          map[string]*Object
+	defaultRequire func(name string) (any, error)
 }
 
-func NewRegistery() ModuleRegistery {
-	return &moduleRegistery{
+func NewRegistery(defaultRequire ...func(name string) (any, error)) ModuleRegistery {
+	mr := &moduleRegistery{
 		modules: make(map[string]Module),
 		cache:   make(map[string]*Object),
 	}
+
+	if len(defaultRequire) > 1 {
+		panic("can not register multiple default  require!")
+	}
+
+	if len(defaultRequire) == 1 {
+		mr.defaultRequire = defaultRequire[0]
+	}
+
+	return mr
 }
 
 func (mr *moduleRegistery) Register(name string, mod Module) {
@@ -43,8 +54,9 @@ func (mr *moduleRegistery) copyModules() map[string]Module {
 
 func (mr *moduleRegistery) Copy() ModuleRegistery {
 	return &moduleRegistery{
-		modules: mr.copyModules(),
-		cache:   make(map[string]*Object),
+		modules:        mr.copyModules(),
+		cache:          make(map[string]*Object),
+		defaultRequire: mr.defaultRequire,
 	}
 }
 
@@ -53,6 +65,9 @@ func (mr *moduleRegistery) Require(name string) (any, error) {
 	defer mr.rw.Unlock()
 	m, ok := mr.modules[name]
 	if !ok {
+		if mr.defaultRequire != nil {
+			return mr.defaultRequire(name)
+		}
 		return nil, fmt.Errorf("module %s not found!", name)
 	}
 
