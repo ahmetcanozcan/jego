@@ -31,25 +31,27 @@ func (cm *customModule) Copy() jego.Module {
 }
 
 func main() {
-
-	e := jego.New()
-	e.Register("custom", &customModule{})
-	e.Register("echo", jego.ValueModule(func(v string) string {
+	mr := jego.NewRegistery(func(name string) (any, error) {
+		return "default_value", nil
+	})
+	mr.Register("custom", &customModule{})
+	mr.Register("echo", jego.ValueModule(func(v string) string {
 		return "echo: " + v
 	}))
-	e.Register("functional", jego.FuncModule(func() (any, error) {
+	mr.Register("functional", jego.FuncModule(func() (any, error) {
 		return jego.JSObject{
 			"foo": "bar",
 			"zoo": 18,
 		}, nil
 	}))
 
-	modJS, err := e.ImportJSModule(strings.NewReader(modJS))
+	modJS, err := jego.JSModule(strings.NewReader(modJS), mr)
 	if err != nil {
 		panic(err)
 	}
+	mr.Register("mod", modJS)
 
-	e.Register("mod", modJS)
+	e := jego.New().SetRegistery(mr)
 
 	s, _ := e.Script(strings.NewReader(testFile))
 
