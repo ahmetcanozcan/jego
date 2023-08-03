@@ -18,7 +18,7 @@ type moduleRegistery struct {
 	cache   map[string]*Object
 }
 
-func newModuleRegistery() ModuleRegistery {
+func NewRegistery() ModuleRegistery {
 	return &moduleRegistery{
 		modules: make(map[string]Module),
 		cache:   make(map[string]*Object),

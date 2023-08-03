@@ -1,5 +1,11 @@
 package jego
 
+import (
+	"io"
+
+	"github.com/ahmetcanozcan/jego/js"
+)
+
 type Module interface {
 	Require() (any, error)
 	Copy() Module
@@ -31,4 +37,32 @@ func (m *valueModule) Require() (any, error) {
 
 func (m *valueModule) Copy() Module {
 	return m
+}
+
+func JSModule(src io.Reader, registery ...ModuleRegistery) (Module, error) {
+	if len(registery) == 0 {
+		registery = append(registery, NewRegistery())
+	}
+	mr := registery[0]
+
+	transformed, err := js.Transform(src)
+	if err != nil {
+		return nil, err
+	}
+	sc, err := newScript(transformed, mr.Copy())
+	if err != nil {
+		return nil, err
+	}
+
+	v, err := sc.GetValue("default")
+	if err != nil {
+		return nil, err
+	}
+
+	if v.IsObject() {
+		return ValueModule(v.Object()), nil
+
+	}
+
+	return ValueModule(v), nil
 }
